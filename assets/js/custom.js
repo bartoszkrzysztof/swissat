@@ -28,11 +28,12 @@ $('.p-kontakt01-boxy > .p-kontakt01-box h3').on('click', function(e) {
 
    });
      
+ 
      
      
 }); 
 
 
  AOS.init();
-      
+
          
