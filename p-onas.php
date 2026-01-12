@@ -12,9 +12,7 @@ get_header();
         <h3>FUNDAMENTY ZBUDOWANE NA ZAUFANIU</h3>
 <p> Budujemy innowacyjne wartości, nie tylko ściany. </p>     
         </div>     
-    <div class="box-b"  >
-           
-    </div>    
+      
   </div>
         
     </section>

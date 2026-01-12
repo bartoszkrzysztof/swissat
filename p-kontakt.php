@@ -9,11 +9,13 @@ get_header();
          
     
 
-<div class="p-kontakt01-wrap pod-wrap ">  
+<div class="p-kontakt01-wrap pod-wrap "      >  
 
     
-<h1> HELLO LET’S TALK ABOUT YOUR PROJECT </h1>
-<h2> Napisz do nas w sprawie swojego projektu! </h2>
+
+<h1> Napisz do nas w sprawie swojego projektu! </h1>
+    
+<h2> HELLO LET’S TALK ABOUT YOUR PROJECT </h2>
 
  <div class="p-kontakt01-boxy" >
      

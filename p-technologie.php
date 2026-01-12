@@ -17,7 +17,7 @@ get_header();
         <div class="box-aa">  
      <h3>ODKRYWANIE ELEGANCJI DOMÓW SZKIELETOWYCH</h3>
      <h2>Budynki drewniane</h2>
-     <a href="#">ZBADAJ SZCZEGÓŁY NASZYCH TECHNOLOGII</a>
+     <a href="/drewniane/">ZBADAJ SZCZEGÓŁY NASZYCH TECHNOLOGII</a>
    
         </div>     
         </div>     
@@ -30,7 +30,7 @@ get_header();
 <div class="box-bb" > 
     <h3>NIEZMIENNA SZTUKA TRADYCYJNEJ TECHNOLOGI MUROWANEJ</h3>
      <h2>Budynki murowane</h2>
-     <a href="#">ZBADAJ SZCZEGÓŁY NASZYCH TECHNOLOGII</a>
+     <a href="/murowane/">ZBADAJ SZCZEGÓŁY NASZYCH TECHNOLOGII</a>
     </div>    
     </div>    
   </div>
