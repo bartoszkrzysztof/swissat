@@ -52,3 +52,8 @@ założeniem jest stworzenie w panelu wp-admin posta 'cf-form' pola do definicji
 1. pole powinno być html i móc przekazywać te wartości (brak czyszczenia html, usuwanie tylko <script></script> oraz <?php ?> i <?= ?>),
 2. deklaracja pól powinna się odbywać przy użyciu definicji name wewnątrz bracket np. [email] - dane pola powinny być parsowane na bazie definicji pola (typ, name, klasy, opcje, domyślna wartość),
 3. Sparsowana treść ma być wyswietlana przez shortcode.
+-------------------------------------------------------------------------
+# Aplikacja obsługująca formularze kontaktowe w szablonie WordPress - część 4
+## główne założenia:
+1. dodanie strony opcji w formularzach 'cf-form'
+2. Dodanie klucza google recapcha definiowanego w ustawieniach modułu

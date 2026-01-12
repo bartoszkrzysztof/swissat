@@ -17,11 +17,20 @@ class CF_Validator {
      * @param array $form_data Dane z formularza
      * @param array $fields_config Konfiguracja pól
      * @param array $files Przesłane pliki
+     * @param int $form_id ID formularza
      * @return array Wynik walidacji
      */
-    public function validate($form_data, $fields_config = [], $files = [])
+    public function validate($form_data, $fields_config = [], $files = [], $form_id = 0)
     {
         $this->errors = [];
+
+        // Walidacja reCAPTCHA jeśli jest włączona
+        if ($form_id > 0) {
+            $enable_recaptcha = get_post_meta($form_id, '_cf_enable_recaptcha', true);
+            if ($enable_recaptcha && CF_Settings::is_recaptcha_configured()) {
+                $this->validate_recaptcha($form_data);
+            }
+        }
 
         // Walidacja na podstawie konfiguracji pól
         if (!empty($fields_config) && is_array($fields_config)) {
@@ -173,6 +182,61 @@ class CF_Validator {
             if ($file['error'] !== UPLOAD_ERR_OK) {
                 $this->errors[$field_name] = 'Wystąpił błąd podczas przesyłania pliku';
             }
+        }
+    }
+
+    /**
+     * Waliduje Google reCAPTCHA
+     * 
+     * @param array $form_data Dane z formularza
+     */
+    private function validate_recaptcha($form_data)
+    {
+        $recaptcha_response = $form_data['g-recaptcha-response'] ?? '';
+        
+        if (empty($recaptcha_response)) {
+            $this->errors['recaptcha'] = 'Proszę potwierdzić, że nie jesteś robotem';
+            return;
+        }
+
+        $secret_key = CF_Settings::get_secret_key();
+        
+        // Wywołanie API Google reCAPTCHA
+        $verify_url = 'https://www.google.com/recaptcha/api/siteverify';
+        $response = wp_remote_post($verify_url, [
+            'body' => [
+                'secret' => $secret_key,
+                'response' => $recaptcha_response,
+                'remoteip' => $this->get_user_ip()
+            ]
+        ]);
+
+        if (is_wp_error($response)) {
+            $this->errors['recaptcha'] = 'Błąd weryfikacji reCAPTCHA. Spróbuj ponownie.';
+            return;
+        }
+
+        $response_body = wp_remote_retrieve_body($response);
+        $result = json_decode($response_body, true);
+
+        if (empty($result['success'])) {
+            $this->errors['recaptcha'] = 'Weryfikacja reCAPTCHA nie powiodła się. Spróbuj ponownie.';
+        }
+    }
+
+    /**
+     * Pobiera IP użytkownika
+     * 
+     * @return string
+     */
+    private function get_user_ip()
+    {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            return $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            return $_SERVER['REMOTE_ADDR'] ?? '';
         }
     }
 

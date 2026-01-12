@@ -117,7 +117,7 @@ class CF_View_Parser {
         ob_start();
         ?>
         <div class="<?php echo esc_attr(implode(' ', $wrapper_classes)); ?>">
-            <?php if ($type !== 'hidden' && $type !== 'checkbox'): ?>
+            <?php if ($type !== 'hidden' && $type !== 'checkbox' && $type !== 'checkboxes'): ?>
                 <label for="<?php echo $field_id; ?>">
                     <?php echo $label; ?>
                     <?php if ($required): ?>
@@ -137,12 +137,20 @@ class CF_View_Parser {
                     $this->render_select($field, $field_id);
                     break;
                 
+                case 'multiselect':
+                    $this->render_multiselect($field, $field_id);
+                    break;
+                
                 case 'radio':
                     $this->render_radio($field);
                     break;
                 
                 case 'checkbox':
                     $this->render_checkbox($field, $field_id, $label);
+                    break;
+                
+                case 'checkboxes':
+                    $this->render_checkboxes($field, $label);
                     break;
                 
                 case 'file':
@@ -244,6 +252,72 @@ class CF_View_Parser {
                 <?php endif; ?>
             </label>
         </div>
+        <?php
+    }
+
+    /**
+     * Renderuje listę checkboxów (checkboxes)
+     */
+    private function render_checkboxes($field, $label)
+    {
+        $name = esc_attr($field['name']);
+        $required = !empty($field['required']) ? 'required' : '';
+        $options = !empty($field['options']) ? $field['options'] : [];
+        $selected_values = !empty($field['value']) && is_array($field['value']) ? $field['value'] : [];
+        
+        ?>
+        <fieldset class="cf-checkboxes-group">
+            <legend>
+                <?php echo esc_html($label); ?>
+                <?php if ($required): ?>
+                    <span class="required">*</span>
+                <?php endif; ?>
+            </legend>
+            <?php foreach ($options as $value => $option_label): 
+                $checkbox_id = 'cf-' . $name . '-' . sanitize_title($value);
+                $checked = in_array($value, $selected_values) ? 'checked' : '';
+            ?>
+                <div class="cf-checkbox-option">
+                    <input type="checkbox" 
+                           id="<?php echo $checkbox_id; ?>" 
+                           name="<?php echo $name; ?>[]" 
+                           value="<?php echo esc_attr($value); ?>" 
+                           <?php echo $checked; ?>
+                           <?php echo $required; ?>>
+                    <label for="<?php echo $checkbox_id; ?>"><?php echo esc_html($option_label); ?></label>
+                </div>
+            <?php endforeach; ?>
+        </fieldset>
+        <?php
+    }
+
+    /**
+     * Renderuje pole multiselect
+     */
+    private function render_multiselect($field, $field_id)
+    {
+        $name = esc_attr($field['name']);
+        $required = !empty($field['required']) ? 'required' : '';
+        $options = !empty($field['options']) ? $field['options'] : [];
+        $selected_values = !empty($field['value']) && is_array($field['value']) ? $field['value'] : [];
+        $size = !empty($field['size']) ? intval($field['size']) : 5;
+        
+        ?>
+        <select id="<?php echo $field_id; ?>" 
+                name="<?php echo $name; ?>[]" 
+                multiple 
+                size="<?php echo $size; ?>" 
+                class="cf-multiselect" 
+                <?php echo $required; ?>>
+            <?php foreach ($options as $value => $option_label): 
+                $selected = in_array($value, $selected_values) ? 'selected' : '';
+            ?>
+                <option value="<?php echo esc_attr($value); ?>" <?php echo $selected; ?>>
+                    <?php echo esc_html($option_label); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <p class="description">Przytrzymaj Ctrl (Cmd na Mac) aby wybrać wiele opcji</p>
         <?php
     }
 

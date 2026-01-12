@@ -33,8 +33,10 @@ Moduł obsługi formularzy kontaktowych zintegrowany z szablonem WordPress, opar
    - **Text inputs**: text, email, tel, url, number, date, time, hidden, password
    - **Textarea**: wieloliniowe pole tekstowe
    - **Select**: lista rozwijana
+   - **Multiselect**: lista wielokrotnego wyboru (z przytrzymaniem Ctrl/Cmd)
    - **Radio**: przyciski radio
-   - **Checkbox**: pola wyboru
+   - **Checkbox**: pojedyncze pole wyboru
+   - **Checkboxes**: lista pól wyboru (wielokrotny wybór)
    - **File**: upload plików z walidacją typu i rozmiaru
 
 6. **ACF Pro - definicja programistyczna**
@@ -53,6 +55,7 @@ Moduł obsługi formularzy kontaktowych zintegrowany z szablonem WordPress, opar
    - Walidacja typów: email, url, tel, number
    - Walidacja plików (rozmiar, typ, rozszerzenia)
    - Możliwość dodania własnej walidacji poprzez hooki
+   - **Google reCAPTCHA v2** - Ochrona przed spamem (opcjonalna)
 
 9. **Wysyłanie maili**
    - Parsowanie szablonu email z `[name_pola]`
@@ -62,6 +65,11 @@ Moduł obsługi formularzy kontaktowych zintegrowany z szablonem WordPress, opar
 10. **Assets**
     - JavaScript z walidacją i obsługą AJAX
     - CSS ze stylami formularzy (responsywne)
+
+11. **Strona ustawień modułu (CF_Settings)**
+    - Konfiguracja Google reCAPTCHA v2 (Site Key i Secret Key)
+    - Możliwość włączania/wyłączania reCAPTCHA dla poszczególnych formularzy
+    - Instrukcje konfiguracji kluczy API
 
 ### 🔧 Do rozbudowy
 
@@ -78,13 +86,14 @@ wp-content/themes/wwwmotyw/inc/ContactForm/
 ├── config-example.php                   # Przykład konfiguracji źródła pól
 ├── fields-config-example.json           # Przykład pliku JSON z polami
 ├── includes/
-│   ├── acf-fields-definition.php       # Definicja pól ACF (PHP) - NOWE
+│   ├── acf-fields-definition.php       # Definicja pól ACF (PHP)
+│   ├── class-cf-settings.php           # Strona ustawień modułu - NOWE
 │   ├── class-cf-field-manager.php      # Zarządzanie polami
-│   ├── class-cf-view-parser.php        # Parser widoku HTML - NOWE
+│   ├── class-cf-view-parser.php        # Parser widoku HTML
 │   ├── class-cf-post-types.php         # Custom Post Types
 │   ├── class-cf-shortcode.php          # Obsługa shortcode + renderowanie
 │   ├── class-cf-rest-api.php           # Endpointy REST API
-│   ├── class-cf-validator.php          # Walidacja danych
+│   ├── class-cf-validator.php          # Walidacja danych + reCAPTCHA - ZAKTUALIZOWANE
 │   └── class-cf-mailer.php             # Wysyłanie emaili
 └── assets/
     ├── js/
@@ -154,12 +163,21 @@ define('CF_FIELD_SOURCE', 'acf');
    - Tytuł formularza
    - Email odbiorcy
    - Temat wiadomości
+   - **Opcjonalnie:** Włącz Google reCAPTCHA (wymaga konfiguracji kluczy w Ustawieniach)
 4. W sekcji "Pola formularza" zdefiniuj pola (format zależy od wybranego źródła)
 5. **OPCJONALNIE:** W sekcji "Widok HTML formularza" zdefiniuj własny układ HTML używając `[name_pola]`
 6. W sekcji "Szablon wiadomości email" użyj `[name_pola]` dla dynamicznej treści
 7. Opublikuj formularz
 
-### 4. Osadzenie formularza
+### 4. Konfiguracja Google reCAPTCHA (opcjonalnie)
+
+1. Przejdź do **Formularze → Ustawienia**
+2. Uzyskaj klucze z https://www.google.com/recaptcha/admin (wybierz reCAPTCHA v2 "Checkbox")
+3. Wpisz **Site Key** i **Secret Key**
+4. Zapisz ustawienia
+5. W ustawieniach formularza zaznacz **"Włącz Google reCAPTCHA"**
+
+### 5. Osadzenie formularza
 
 Skopiuj shortcode z metaboxa "Shortcode" i wklej w treści strony:
 
@@ -248,13 +266,15 @@ Każde pole powinno zawierać:
 - `text`, `email`, `tel`, `url`, `number` - pola tekstowe
 - `textarea` - pole wieloliniowe
 - `select` - lista rozwijana
+- `multiselect` - lista wielokrotnego wyboru
 - `radio` - przyciski opcji
-- `checkbox` - pole wyboru
+- `checkbox` - pojedyncze pole wyboru
+- `checkboxes` - lista pól wyboru (wielokrotny wybór)
 - `file` - upload pliku
 - `date`, `time`, `datetime-local` - pola daty/czasu
 - `hidden`, `password` - specjalne
 
-#### Opcje dla select/radio
+#### Opcje dla select/radio/checkboxes/multiselect
 
 Format JSON:
 ```json
@@ -267,6 +287,39 @@ Format JSON:
 Lub string (w textarea):
 ```
 "options": "wartość1:Etykieta 1,wartość2:Etykieta 2"
+```
+
+**Przykład checkboxes (lista pól wyboru):**
+```json
+{
+  "name": "interests",
+  "type": "checkboxes",
+  "label": "Zainteresowania",
+  "required": true,
+  "options": {
+    "sport": "Sport",
+    "music": "Muzyka",
+    "travel": "Podróże",
+    "tech": "Technologia"
+  }
+}
+```
+
+**Przykład multiselect:**
+```json
+{
+  "name": "services",
+  "type": "multiselect",
+  "label": "Wybierz usługi",
+  "required": false,
+  "size": 5,
+  "options": {
+    "web": "Strony internetowe",
+    "seo": "Pozycjonowanie SEO",
+    "ads": "Kampanie reklamowe",
+    "social": "Social Media"
+  }
+}
 ```
 
 #### Klasy CSS
@@ -706,7 +759,9 @@ add_action('cf_form_submitted', function($form_id, $form_data, $sended_id) {
 - Walidacja typów plików
 - Limit rozmiaru plików
 - Sanityzacja widoku HTML (usuwanie `<script>`, `<?php ?>`, `<?= ?>`)
-- Zabezpieczenie przed spamem (gotowe do integracji z CAPTCHA)
+- **Google reCAPTCHA v2** - Ochrona przed spamem i botami (opcjonalna)
+- Walidacja reCAPTCHA po stronie serwera z weryfikacją IP
+- Bezpieczne przechowywanie kluczy API w opcjach WordPress
 
 ## Wymagania
 
@@ -714,6 +769,7 @@ add_action('cf_form_submitted', function($form_id, $form_data, $sended_id) {
 - PHP 7.4+
 - jQuery (dołączony do WP)
 - ACF Pro (opcjonalnie, tylko dla źródła 'acf')
+- Klucze Google reCAPTCHA v2 (opcjonalnie, dla ochrony przed spamem)
 
 ## Roadmap
 
@@ -722,14 +778,34 @@ add_action('cf_form_submitted', function($form_id, $form_data, $sended_id) {
 - [x] Normalizacja danych z różnych źródeł
 - [x] Własny widok HTML formularza z parserem `[name_pola]`
 - [x] ACF - definicja programistyczna w PHP
+- [x] Integracja z Google reCAPTCHA v2
 - [ ] Warunkowe pokazywanie pól (conditional logic)
 - [ ] GUI kreator pól w panelu admin
-- [ ] Integracja z Google reCAPTCHA
 - [ ] Export wysłanych formularzy do CSV
 - [ ] Multi-step forms (wielokrokowe formularze)
 - [ ] Szablony gotowych formularzy
+- [ ] Integracja z popularnymi CRM
 
 ## Changelog
+
+### v4.1.0 (2026-01-12)
+- ✅ Dodano typ pola **checkboxes** (lista pól wyboru z wielokrotnym wyborem)
+- ✅ Dodano typ pola **multiselect** (lista wielokrotnego wyboru)
+- ✅ Obsługa checkboxes w shortcode, view parser i ACF
+- ✅ Obsługa multiselect z możliwością ustawienia rozmiaru (size)
+- ✅ Zaktualizowana dokumentacja z przykładami użycia
+- ✅ Instrukcje obsługi dla użytkowników (Ctrl/Cmd dla multiselect)
+
+### v4.0.0 (2026-01-12)
+- ✅ Dodano CF_Settings - strona ustawień modułu
+- ✅ Konfiguracja Google reCAPTCHA v2 (Site Key i Secret Key)
+- ✅ Możliwość włączania/wyłączania reCAPTCHA dla poszczególnych formularzy
+- ✅ Walidacja reCAPTCHA po stronie serwera
+- ✅ Automatyczne ładowanie skryptu Google reCAPTCHA
+- ✅ Checkbox w ustawieniach formularza "Włącz Google reCAPTCHA"
+- ✅ Ostrzeżenie w panelu admin gdy reCAPTCHA nie jest skonfigurowana
+- ✅ Instrukcje konfiguracji kluczy w stronie ustawień
+- ✅ Zaktualizowana dokumentacja z konfiguracją reCAPTCHA
 
 ### v3.0.0 (2026-01-12)
 - ✅ Dodano CF_View_Parser - parser widoku HTML formularza
@@ -761,27 +837,6 @@ add_action('cf_form_submitted', function($form_id, $form_data, $sended_id) {
 - ✅ Walidacja PHP i JavaScript
 - ✅ Wysyłanie emaili przez wp_mail()
 - ✅ Assets (JS, CSS)
-- [ ] GUI kreator pól w panelu admin
-- [ ] Integracja z Google reCAPTCHA
-- [ ] Export wysłanych formularzy do CSV
-- [ ] Multi-step forms (wielokrokowe formularze)
-- [ ] Szablony gotowych formularzy
-- [ ] Integracja z popularnymi CRM
-
-## Changelog
-
-### v2.0.0 (2026-01-12)
-- ✅ Dodano CF_Field_Manager - zarządzanie polami z 3 źródeł
-- ✅ Obsługa textarea JSON (domyślnie)
-- ✅ Obsługa pliku JSON
-- ✅ Obsługa ACF Pro repeater
-- ✅ Pełne renderowanie wszystkich typów pól
-- ✅ Rozbudowane metaboxy w panelu admin
-- ✅ Przykłady konfiguracji i użycia
-- ✅ Zaktualizowana dokumentacja
-
-### v1.0.0
-- ✅ Podstawowa struktura modułu
 - ✅ Custom Post Types (cf-form, cf-sended)
 - ✅ Shortcode z podstawowym formularzem
 - ✅ REST API (validate, submit)

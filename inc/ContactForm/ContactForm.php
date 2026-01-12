@@ -52,6 +52,7 @@ class ContactForm {
      */
     private function includes()
     {
+        require_once $this->plugin_path . 'includes/class-cf-settings.php';
         require_once $this->plugin_path . 'includes/class-cf-field-manager.php';
         require_once $this->plugin_path . 'includes/class-cf-view-parser.php';
         require_once $this->plugin_path . 'includes/class-cf-post-types.php';
@@ -80,6 +81,7 @@ class ContactForm {
      */
     public function init()
     {
+        $this->settings = new CF_Settings();
         $this->post_types = new CF_Post_Types();
         $this->shortcode = new CF_Shortcode();
         $this->rest_api = new CF_Rest_API();

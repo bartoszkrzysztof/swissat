@@ -97,7 +97,7 @@ class CF_Rest_API {
         $fields_config = $field_manager->get_fields($form_id);
 
         $validator = new CF_Validator();
-        $validation_result = $validator->validate($form_data, $fields_config, $_FILES);
+        $validation_result = $validator->validate($form_data, $fields_config, $_FILES, $form_id);
 
         if (!$validation_result['valid']) {
             return new WP_REST_Response([

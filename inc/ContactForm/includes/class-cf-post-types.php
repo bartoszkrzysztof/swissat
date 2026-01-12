@@ -301,7 +301,7 @@ class CF_Post_Types {
                     <textarea name="cf_form_fields" id="cf_form_fields" rows="20" style="width:100%; font-family: monospace; font-size: 13px;"><?php echo esc_textarea($fields); ?></textarea>
                     
                     <p class="description">
-                        <strong>Dostępne typy pól:</strong> text, email, tel, url, number, textarea, select, radio, checkbox, file, date, time, hidden
+                        <strong>Dostępne typy pól:</strong> text, email, tel, url, number, textarea, select, multiselect, radio, checkbox, checkboxes, file, date, time, hidden
                     </p>
                 </div>
             <?php elseif ($source_type === 'json_file'): ?>
@@ -347,6 +347,10 @@ class CF_Post_Types {
     {
         $recipient = get_post_meta($post->ID, '_cf_recipient_email', true);
         $subject = get_post_meta($post->ID, '_cf_email_subject', true);
+        $enable_recaptcha = get_post_meta($post->ID, '_cf_enable_recaptcha', true);
+        
+        // Sprawdź czy reCAPTCHA jest skonfigurowana
+        $recaptcha_configured = CF_Settings::is_recaptcha_configured();
         ?>
         <p>
             <label for="cf_recipient_email"><strong>Email odbiorcy:</strong></label><br>
@@ -355,6 +359,28 @@ class CF_Post_Types {
         <p>
             <label for="cf_email_subject"><strong>Temat wiadomości:</strong></label><br>
             <input type="text" id="cf_email_subject" name="cf_email_subject" value="<?php echo esc_attr($subject); ?>" style="width:100%;">
+        </p>
+        <hr>
+        <p>
+            <label>
+                <input type="checkbox" 
+                       name="cf_enable_recaptcha" 
+                       id="cf_enable_recaptcha" 
+                       value="1" 
+                       <?php checked($enable_recaptcha, '1'); ?>
+                       <?php echo !$recaptcha_configured ? 'disabled' : ''; ?>>
+                <strong>Włącz Google reCAPTCHA</strong>
+            </label>
+            <?php if (!$recaptcha_configured): ?>
+                <br>
+                <span class="description" style="color: #d63638;">
+                    ⚠ reCAPTCHA nie jest skonfigurowana. 
+                    <a href="<?php echo admin_url('edit.php?post_type=cf-form&page=cf-settings'); ?>">Przejdź do ustawień</a>
+                </span>
+            <?php else: ?>
+                <br>
+                <span class="description">Zabezpiecz formularz przed spamem za pomocą Google reCAPTCHA v2</span>
+            <?php endif; ?>
         </p>
         <?php
     }
@@ -379,29 +405,29 @@ class CF_Post_Types {
             <div id="cf-view-example" style="display: none; background: #fafafa; padding: 15px; margin: 10px 0; border: 1px solid #ddd;">
                 <strong>Przykład widoku HTML:</strong>
                 <pre style="margin: 10px 0; font-size: 12px; line-height: 1.6;">&lt;div class="row"&gt;
-    &lt;div class="col-md-6"&gt;
-        &lt;div class="form-group"&gt;
-            [fullname]
-        &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class="col-md-6"&gt;
-        &lt;div class="form-group"&gt;
-            [email]
-        &lt;/div&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
+                    &lt;div class="col-md-6"&gt;
+                        &lt;div class="form-group"&gt;
+                            [fullname]
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="col-md-6"&gt;
+                        &lt;div class="form-group"&gt;
+                            [email]
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
 
-&lt;div class="form-group"&gt;
-    [phone]
-&lt;/div&gt;
+                &lt;div class="form-group"&gt;
+                    [phone]
+                &lt;/div&gt;
 
-&lt;div class="form-group"&gt;
-    [message]
-&lt;/div&gt;
+                &lt;div class="form-group"&gt;
+                    [message]
+                &lt;/div&gt;
 
-&lt;div class="form-group"&gt;
-    [newsletter]
-&lt;/div&gt;</pre>
+                &lt;div class="form-group"&gt;
+                    [newsletter]
+                &lt;/div&gt;</pre>
                 <p class="description">
                     Każdy <code>[name_pola]</code> zostanie zastąpiony pełnym HTML pola (label + input/textarea/select/etc.)
                 </p>
@@ -544,6 +570,13 @@ class CF_Post_Types {
 
         if (isset($_POST['cf_email_template'])) {
             update_post_meta($post_id, '_cf_email_template', wp_kses_post($_POST['cf_email_template']));
+        }
+
+        // Zapisywanie opcji reCAPTCHA
+        if (isset($_POST['cf_enable_recaptcha'])) {
+            update_post_meta($post_id, '_cf_enable_recaptcha', '1');
+        } else {
+            delete_post_meta($post_id, '_cf_enable_recaptcha');
         }
 
         // Zapisywanie widoku formularza z sanityzacją

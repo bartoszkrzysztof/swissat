@@ -6,15 +6,15 @@
 
 /* Wrapper formularza */
 .cf-form-wrapper {
-    max-width: 600px;
-    margin: 0 auto;
+    /* max-width: 600px;
+    margin: 0 auto; */
+    position: relative;
 }
 
 /* Formularz */
 .cf-form {
-    background: #fff;
-    padding: 20px;
-    border-radius: 4px;
+    /* padding: 20px; */
+    position: relative;
 }
 
 /* Komunikaty */
@@ -42,14 +42,21 @@
 
 /* Pola formularza */
 .cf-field-wrapper {
+    padding: 10px 0;
     margin-bottom: 20px;
+}
+
+.cf-field-wrapper.-textarea {
+    padding-top: 0;
+    margin-top: 10px;
 }
 
 .cf-field-wrapper label {
     display: block;
     margin-bottom: 5px;
     font-weight: 600;
-    color: #333;
+    color: #888888;
+    font-size: 14px;
 }
 
 .cf-field-wrapper label .required {
@@ -61,14 +68,21 @@
 .cf-field-wrapper input[type="tel"],
 .cf-field-wrapper input[type="url"],
 .cf-field-wrapper input[type="number"],
+.cf-field-wrapper input[type="date"],
 .cf-field-wrapper textarea,
 .cf-field-wrapper select {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: 10px 0;
+    border: 0;
+    border-bottom: 1px solid #777771;
+    border-radius: 0;
     transition: border-color 0.3s ease;
+}
+
+
+.cf-field-wrapper textarea {
+    padding: 30px 12px 10px 12px;
+    border: 1px solid #777771;
 }
 
 .cf-field-wrapper input[type="text"]:focus,
@@ -76,15 +90,29 @@
 .cf-field-wrapper input[type="tel"]:focus,
 .cf-field-wrapper input[type="url"]:focus,
 .cf-field-wrapper input[type="number"]:focus,
+.cf-field-wrapper input[type="date"]:focus,
 .cf-field-wrapper textarea:focus,
 .cf-field-wrapper select:focus {
     outline: none;
-    border-color: #007bff;
+    border-bottom-color: #17A8E3;
+    /* border-color: #007bff; */
+}
+
+.cf-field-wrapper input[type="text"]:focus label,
+.cf-field-wrapper input[type="email"]:focus label,
+.cf-field-wrapper input[type="tel"]:focus label,
+.cf-field-wrapper input[type="url"]:focus label,
+.cf-field-wrapper input[type="number"]:focus label,
+.cf-field-wrapper input[type="date"]:focus label,
+.cf-field-wrapper textarea:focus label,
+.cf-field-wrapper select:focus label {
+    color: #17A8E3;
 }
 
 /* Pole z błędem */
 .cf-field-invalid {
     border-color: #dc3545 !important;
+    border-bottom-color: #dc3545 !important;
 }
 
 .cf-field-error {
@@ -203,4 +231,75 @@
 
 .cf-field-group .cf-field-wrapper {
     flex: 1;
+}
+.cf-field-wrapper legend {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #888888;
+    font-size: 14px;
+}
+
+.cf-field-wrapper .cf-radio-option,
+.cf-field-wrapper .cf-checkbox-option {
+    margin-bottom: 8px;
+}
+
+.cf-field-wrapper .cf-radio-option input,
+.cf-field-wrapper .cf-checkbox-option input {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+    visibility: hidden;
+}
+.cf-field-wrapper .cf-radio-option input + label,
+.cf-field-wrapper .cf-checkbox-option input + label {
+    font-size: 16px;
+    color: #333333;
+    position: relative;
+    display: flex;
+    align-self: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+}
+.cf-field-wrapper .cf-radio-option input + label:after,
+.cf-field-wrapper .cf-checkbox-option input + label:after,
+.cf-field-wrapper .cf-radio-option input + label:before,
+.cf-field-wrapper .cf-checkbox-option input + label:before {
+    content: '';
+    display: inline-block;
+    transition: all 0.3s ease;
+    width: 18px;
+    height: 18px;
+    box-sizing: border-box;
+}
+.cf-field-wrapper .cf-radio-option input + label:before,
+.cf-field-wrapper .cf-checkbox-option input + label:before {
+    border: 1px solid #777771;
+    margin-top: 5px;
+}
+.cf-field-wrapper .cf-radio-option input + label:after,
+.cf-field-wrapper .cf-checkbox-option input + label:after {
+    position: absolute;
+    top: 9px;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    background-color: #17A8E3;
+    opacity: 0;
+    visibility: hidden;
+    border: 0;
+}
+.cf-field-wrapper .cf-radio-option input:checked + label:after,
+.cf-field-wrapper .cf-checkbox-option input:checked + label:after {
+    opacity: 1;
+    visibility: visible;
+}
+.cf-field-wrapper .cf-radio-option input:checked + label:before,
+.cf-field-wrapper .cf-checkbox-option input:checked + label:before {
+    border: 1px solid #17A8E3;
+}
+.cf-field-wrapper .cf-radio-option input + label:after,
+.cf-field-wrapper .cf-radio-option input + label:before {
+    border-radius: 100%;
 }

@@ -67,8 +67,10 @@ if (function_exists('acf_add_local_field_group')) {
                             'number' => 'Numer',
                             'textarea' => 'Textarea',
                             'select' => 'Select',
+                            'multiselect' => 'Multiselect (wielokrotny wybór)',
                             'radio' => 'Radio',
                             'checkbox' => 'Checkbox',
+                            'checkboxes' => 'Checkboxes (lista)',
                             'file' => 'Plik',
                             'date' => 'Data',
                             'time' => 'Czas',
@@ -157,6 +159,20 @@ if (function_exists('acf_add_local_field_group')) {
                                     'field' => 'field_cf_field_type',
                                     'operator' => '==',
                                     'value' => 'checkbox',
+                                ],
+                            ],
+                            [
+                                [
+                                    'field' => 'field_cf_field_type',
+                                    'operator' => '==',
+                                    'value' => 'multiselect',
+                                ],
+                            ],
+                            [
+                                [
+                                    'field' => 'field_cf_field_type',
+                                    'operator' => '==',
+                                    'value' => 'checkboxes',
                                 ],
                             ],
                         ],
