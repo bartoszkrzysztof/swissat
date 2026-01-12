@@ -1,6 +1,6 @@
 <?php
 
-
+include_once get_template_directory() . '/inc/bootstrap.php';
 
 if ( function_exists( 'register_nav_menus' ) ) {
 	register_nav_menus(

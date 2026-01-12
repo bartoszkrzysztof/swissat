@@ -1,0 +1,72 @@
+{
+  "1": [
+    {
+      "name": "fullname",
+      "type": "text",
+      "label": "Imię i nazwisko",
+      "placeholder": "Jan Kowalski",
+      "required": true,
+      "css_classes": ["form-control", "large"]
+    },
+    {
+      "name": "email",
+      "type": "email",
+      "label": "Adres email",
+      "required": true,
+      "css_classes": ["form-control"]
+    },
+    {
+      "name": "phone",
+      "type": "tel",
+      "label": "Numer telefonu",
+      "placeholder": "+48 123 456 789",
+      "css_classes": ["form-control", "phone"]
+    },
+    {
+      "name": "subject",
+      "type": "select",
+      "label": "Temat wiadomości",
+      "required": true,
+      "options": {
+        "general": "Pytanie ogólne",
+        "support": "Wsparcie techniczne",
+        "sales": "Zapytanie handlowe",
+        "other": "Inne"
+      }
+    },
+    {
+      "name": "message",
+      "type": "textarea",
+      "label": "Treść wiadomości",
+      "required": true,
+      "rows": 8,
+      "css_classes": ["form-control", "large"]
+    },
+    {
+      "name": "newsletter",
+      "type": "checkbox",
+      "label": "Chcę otrzymywać newsletter",
+      "value": "yes"
+    }
+  ],
+  "default": [
+    {
+      "name": "name",
+      "type": "text",
+      "label": "Imię i nazwisko",
+      "required": true
+    },
+    {
+      "name": "email",
+      "type": "email",
+      "label": "Email",
+      "required": true
+    },
+    {
+      "name": "message",
+      "type": "textarea",
+      "label": "Wiadomość",
+      "required": true
+    }
+  ]
+}
