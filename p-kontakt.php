@@ -17,7 +17,9 @@
                         <?php if ($form['form_id']) : ?>
                             <div class="p-kontakt01-box" > 
                                 <h3> <?php echo esc_html( $form['header'] ); ?> </h3>  
-                                <?php echo do_shortcode( '[contact_form id="' . esc_html( $form['form_id'] ) . '"]' ); ?>
+                                <div class="form-wrap">
+                                    <?php echo do_shortcode( '[contact_form id="' . esc_html( $form['form_id'] ) . '"]' ); ?>
+                                </div>
                             </div>
                         <?php endif; ?>
                     <?php endforeach; ?>

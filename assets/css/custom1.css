@@ -8,16 +8,30 @@
     transition: all 0.3s ease;
     font-size: 16px!important;
 }
-
 .js-float-label.-textarea label {
     top: 10px;
     left: 12px;
 }
-
 .js-float-label label.active {
     top: -12px;
     font-size: 14px!important;
 }
 .js-float-label label.focus {
     color: #17A8E3;
+}
+
+.form-intersection {
+    font-size: 20px;
+    font-weight: 600;
+}
+@media (max-width: 600px) {
+    .js-float-label label {
+        position: relative;
+        top: auto;
+        font-size: 14px!important;
+    }
+    .js-float-label label.active {
+        top: auto;
+        font-size: 14px!important;
+    }
 }
