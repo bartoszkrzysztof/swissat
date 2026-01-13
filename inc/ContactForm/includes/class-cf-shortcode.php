@@ -49,11 +49,38 @@ class CF_Shortcode {
         // Sprawdzenie czy istnieje własny widok HTML
         $form_view = get_post_meta($form_id, '_cf_form_view', true);
 
+        // Pobranie dodatkowych opcji formularza
+        $wrapper_classes = get_post_meta($form_id, '_cf_form_wrapper_classes', true);
+        $form_classes = get_post_meta($form_id, '_cf_form_classes', true);
+        $submit_classes = get_post_meta($form_id, '_cf_submit_classes', true);
+        $submit_text = get_post_meta($form_id, '_cf_submit_text', true);
+        
+        // Wartości domyślne
+        if (empty($submit_text)) {
+            $submit_text = 'Wyślij';
+        }
+
+        // Przygotowanie klas CSS
+        $wrapper_class_attr = 'cf-form-wrapper';
+        if (!empty($wrapper_classes)) {
+            $wrapper_class_attr .= ' ' . esc_attr($wrapper_classes);
+        }
+
+        $form_class_attr = 'cf-form';
+        if (!empty($form_classes)) {
+            $form_class_attr .= ' ' . esc_attr($form_classes);
+        }
+
+        $submit_class_attr = 'cf-submit-button';
+        if (!empty($submit_classes)) {
+            $submit_class_attr .= ' ' . esc_attr($submit_classes);
+        }
+
         // Rozpoczęcie bufora
         ob_start();
         ?>
-        <div class="cf-form-wrapper" data-form-id="<?php echo esc_attr($form_id); ?>">
-            <form class="cf-form" id="cf-form-<?php echo esc_attr($form_id); ?>" method="post" enctype="multipart/form-data">
+        <div class="<?php echo $wrapper_class_attr; ?>" data-form-id="<?php echo esc_attr($form_id); ?>">
+            <form class="<?php echo $form_class_attr; ?>" id="cf-form-<?php echo esc_attr($form_id); ?>" method="post" enctype="multipart/form-data">
                 <?php wp_nonce_field('cf_form_submit_' . $form_id, 'cf_form_nonce'); ?>
                 <input type="hidden" name="cf_form_id" value="<?php echo esc_attr($form_id); ?>">
 
@@ -99,7 +126,7 @@ class CF_Shortcode {
                     <?php endif; ?>
                     
                 <div class="cf-field-wrapper cf-submit-wrapper">
-                    <button type="submit" class="cf-submit-button">Wyślij</button>
+                    <button type="submit" class="<?php echo $submit_class_attr; ?>"><?php echo esc_html($submit_text); ?></button>
                 </div>
                 <?php endif; ?>
             </form>

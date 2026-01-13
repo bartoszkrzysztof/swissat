@@ -462,6 +462,45 @@ class CF_Post_Types {
                 }
                 ?>
             </p>
+
+            <hr style="margin: 20px 0;">
+
+            <h4>Opcje formularza</h4>
+            
+            <?php
+            $wrapper_classes = get_post_meta($post->ID, '_cf_form_wrapper_classes', true);
+            $form_classes = get_post_meta($post->ID, '_cf_form_classes', true);
+            $submit_classes = get_post_meta($post->ID, '_cf_submit_classes', true);
+            $submit_text = get_post_meta($post->ID, '_cf_submit_text', true);
+            if (empty($submit_text)) {
+                $submit_text = 'Wyślij';
+            }
+            ?>
+
+            <p>
+                <label for="cf_form_wrapper_classes"><strong>Klasy CSS dla wrappera (.cf-form-wrapper):</strong></label><br>
+                <input type="text" id="cf_form_wrapper_classes" name="cf_form_wrapper_classes" value="<?php echo esc_attr($wrapper_classes); ?>" style="width:100%;" placeholder="np. container my-form-container">
+                <span class="description">Dodatkowe klasy CSS dla głównego kontenera formularza</span>
+            </p>
+
+            <p>
+                <label for="cf_form_classes"><strong>Klasy CSS dla formularza (&lt;form&gt;):</strong></label><br>
+                <input type="text" id="cf_form_classes" name="cf_form_classes" value="<?php echo esc_attr($form_classes); ?>" style="width:100%;" placeholder="np. needs-validation custom-form">
+                <span class="description">Dodatkowe klasy CSS dla elementu &lt;form&gt;</span>
+            </p>
+
+            <p>
+                <label for="cf_submit_classes"><strong>Klasy CSS dla przycisku Submit:</strong></label><br>
+                <input type="text" id="cf_submit_classes" name="cf_submit_classes" value="<?php echo esc_attr($submit_classes); ?>" style="width:100%;" placeholder="np. btn btn-primary btn-lg">
+                <span class="description">Dodatkowe klasy CSS dla przycisku wysyłania formularza</span>
+            </p>
+
+            <p>
+                <label for="cf_submit_text"><strong>Tekst przycisku Submit:</strong></label><br>
+                <input type="text" id="cf_submit_text" name="cf_submit_text" value="<?php echo esc_attr($submit_text); ?>" style="width:100%;" placeholder="Wyślij">
+                <span class="description">Tekst wyświetlany na przycisku wysyłania formularza (domyślnie: "Wyślij")</span>
+            </p>
+
         </div>
         <?php
     }
@@ -577,6 +616,23 @@ class CF_Post_Types {
             update_post_meta($post_id, '_cf_enable_recaptcha', '1');
         } else {
             delete_post_meta($post_id, '_cf_enable_recaptcha');
+        }
+
+        // Zapisywanie opcji formularza (klasy CSS i tekst przycisku)
+        if (isset($_POST['cf_form_wrapper_classes'])) {
+            update_post_meta($post_id, '_cf_form_wrapper_classes', sanitize_text_field($_POST['cf_form_wrapper_classes']));
+        }
+
+        if (isset($_POST['cf_form_classes'])) {
+            update_post_meta($post_id, '_cf_form_classes', sanitize_text_field($_POST['cf_form_classes']));
+        }
+
+        if (isset($_POST['cf_submit_classes'])) {
+            update_post_meta($post_id, '_cf_submit_classes', sanitize_text_field($_POST['cf_submit_classes']));
+        }
+
+        if (isset($_POST['cf_submit_text'])) {
+            update_post_meta($post_id, '_cf_submit_text', sanitize_text_field($_POST['cf_submit_text']));
         }
 
         // Zapisywanie widoku formularza z sanityzacją

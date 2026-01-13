@@ -50,6 +50,34 @@ if (function_exists('acf_add_local_field_group')) {
                         ],
                     ],
                     [
+                        'key' => 'field_cf_field_label',
+                        'label' => 'Label (etykieta)',
+                        'name' => 'label',
+                        'type' => 'text',
+                        'instructions' => 'Etykieta wyświetlana użytkownikowi',
+                        'required' => 0,
+                        'wrapper' => [
+                            'width' => '50',
+                        ],
+                    ],
+                    [
+                        'key' => 'field_cf_field_accordion',
+                        'label' => 'Ustawienia pola',
+                        'name' => '',
+                        'type' => 'accordion',
+                        'instructions' => '',
+                        'required' => 0,
+                        'conditional_logic' => 0,
+                        'wrapper' => array(
+                            'width' => '',
+                            'class' => '',
+                            'id' => '',
+                        ),
+                        'open' => 0,
+                        'multi_expand' => 0,
+                        'endpoint' => 0,
+                    ],
+                    [
                         'key' => 'field_cf_field_type',
                         'label' => 'Typ pola',
                         'name' => 'type',
@@ -84,22 +112,11 @@ if (function_exists('acf_add_local_field_group')) {
                         'ajax' => 0,
                     ],
                     [
-                        'key' => 'field_cf_field_label',
-                        'label' => 'Label (etykieta)',
-                        'name' => 'label',
-                        'type' => 'text',
-                        'instructions' => 'Etykieta wyświetlana użytkownikowi',
-                        'required' => 0,
-                        'wrapper' => [
-                            'width' => '50',
-                        ],
-                    ],
-                    [
                         'key' => 'field_cf_field_placeholder',
                         'label' => 'Placeholder',
                         'name' => 'placeholder',
                         'type' => 'text',
-                        'instructions' => 'Tekst wyświetlany w pustym polu',
+                        'instructions' => '',
                         'required' => 0,
                         'wrapper' => [
                             'width' => '50',
@@ -189,7 +206,7 @@ if (function_exists('acf_add_local_field_group')) {
                         'instructions' => 'Dodatkowe klasy CSS oddzielone spacją',
                         'required' => 0,
                         'wrapper' => [
-                            'width' => '50',
+                            'width' => '100',
                         ],
                     ],
                     [
@@ -209,7 +226,7 @@ if (function_exists('acf_add_local_field_group')) {
                             ],
                         ],
                         'wrapper' => [
-                            'width' => '50',
+                            'width' => '100',
                         ],
                         'default_value' => 5,
                         'min' => 1,

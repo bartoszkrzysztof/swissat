@@ -74,6 +74,7 @@ class ContactForm {
     {
         add_action('init', [$this, 'init'], 0);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
     }
 
     /**
@@ -113,6 +114,24 @@ class ContactForm {
             'ajaxUrl' => rest_url('contact-form/v1/validate'),
             'nonce' => wp_create_nonce('wp_rest'),
         ]);
+    }
+
+    /**
+     * Rejestruje style dla panelu administracyjnego
+     */
+    public function enqueue_admin_scripts($hook)
+    {
+        // Ładuj style tylko na stronach edycji formularzy
+        global $post_type;
+        
+        if ($post_type === 'cf-form' || $hook === 'cf-form_page_cf-settings') {
+            wp_enqueue_style(
+                'cf-admin-style',
+                $this->plugin_url . 'assets/css/admin-style.css',
+                [],
+                '1.0.0'
+            );
+        }
     }
 }
 
