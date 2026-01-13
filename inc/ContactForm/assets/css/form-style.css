@@ -53,7 +53,7 @@
 
 .cf-field-wrapper label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     font-weight: 600;
     color: #888888;
     font-size: 14px;
@@ -234,7 +234,7 @@
 }
 .cf-field-wrapper legend {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     font-weight: 600;
     color: #888888;
     font-size: 14px;
@@ -276,12 +276,12 @@
 .cf-field-wrapper .cf-radio-option input + label:before,
 .cf-field-wrapper .cf-checkbox-option input + label:before {
     border: 1px solid #777771;
-    margin-top: 5px;
+    margin-top: 3px;
 }
 .cf-field-wrapper .cf-radio-option input + label:after,
 .cf-field-wrapper .cf-checkbox-option input + label:after {
     position: absolute;
-    top: 9px;
+    top: 7px;
     left: 4px;
     width: 10px;
     height: 10px;
