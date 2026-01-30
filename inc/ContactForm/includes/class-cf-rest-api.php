@@ -100,9 +100,15 @@ class CF_Rest_API {
         $validation_result = $validator->validate($form_data, $fields_config, $_FILES, $form_id);
 
         if (!$validation_result['valid']) {
+            // Pobranie własnego komunikatu walidacji lub użycie domyślnego
+            $validation_error_msg = get_post_meta($form_id, '_cf_validation_error_message', true);
+            if (empty($validation_error_msg)) {
+                $validation_error_msg = 'Popraw błędy w formularzu';
+            }
+            
             return new WP_REST_Response([
                 'success' => false,
-                'message' => 'Błędy walidacji',
+                'message' => $validation_error_msg,
                 'errors' => $validation_result['errors'],
             ], 400);
         }
@@ -111,9 +117,15 @@ class CF_Rest_API {
         $sended_id = $this->save_sended_form($form_id, $form_data);
 
         if (!$sended_id) {
+            // Pobranie własnego komunikatu błędu lub użycie domyślnego
+            $error_msg = get_post_meta($form_id, '_cf_error_message', true);
+            if (empty($error_msg)) {
+                $error_msg = 'Błąd podczas zapisywania formularza';
+            }
+            
             return new WP_REST_Response([
                 'success' => false,
-                'message' => 'Błąd podczas zapisywania formularza',
+                'message' => $error_msg,
             ], 500);
         }
 
@@ -122,15 +134,27 @@ class CF_Rest_API {
         $email_sent = $mailer->send_form_email($form_id, $form_data);
 
         if (!$email_sent) {
+            // Pobranie własnego komunikatu błędu lub użycie domyślnego
+            $error_msg = get_post_meta($form_id, '_cf_error_message', true);
+            if (empty($error_msg)) {
+                $error_msg = 'Formularz został zapisany, ale wystąpił błąd podczas wysyłania emaila';
+            }
+            
             return new WP_REST_Response([
                 'success' => false,
-                'message' => 'Formularz został zapisany, ale wystąpił błąd podczas wysyłania emaila',
+                'message' => $error_msg,
             ], 500);
+        }
+
+        // Pobranie własnego komunikatu sukcesu lub użycie domyślnego
+        $success_msg = get_post_meta($form_id, '_cf_success_message', true);
+        if (empty($success_msg)) {
+            $success_msg = 'Formularz został wysłany pomyślnie';
         }
 
         return new WP_REST_Response([
             'success' => true,
-            'message' => 'Formularz został wysłany pomyślnie',
+            'message' => $success_msg,
         ], 200);
     }
 

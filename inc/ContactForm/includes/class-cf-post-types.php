@@ -501,6 +501,35 @@ class CF_Post_Types {
                 <span class="description">Tekst wyświetlany na przycisku wysyłania formularza (domyślnie: "Wyślij")</span>
             </p>
 
+            <hr style="margin: 20px 0;">
+
+            <h4>Komunikaty formularza</h4>
+            <p class="description">Zdefiniuj własne komunikaty sukcesu i błędu dla tego formularza. Jeśli pozostawisz puste, zostaną użyte domyślne komunikaty.</p>
+            
+            <?php
+            $success_message = get_post_meta($post->ID, '_cf_success_message', true);
+            $error_message = get_post_meta($post->ID, '_cf_error_message', true);
+            $validation_error_message = get_post_meta($post->ID, '_cf_validation_error_message', true);
+            ?>
+
+            <p>
+                <label for="cf_success_message"><strong>Komunikat sukcesu:</strong></label><br>
+                <input type="text" id="cf_success_message" name="cf_success_message" value="<?php echo esc_attr($success_message); ?>" style="width:100%;" placeholder="Formularz został wysłany pomyślnie">
+                <span class="description">Komunikat wyświetlany po prawidłowym wysłaniu formularza</span>
+            </p>
+
+            <p>
+                <label for="cf_error_message"><strong>Komunikat błędu (ogólny):</strong></label><br>
+                <input type="text" id="cf_error_message" name="cf_error_message" value="<?php echo esc_attr($error_message); ?>" style="width:100%;" placeholder="Wystąpił błąd podczas wysyłania formularza">
+                <span class="description">Komunikat wyświetlany gdy wystąpi błąd po stronie serwera</span>
+            </p>
+
+            <p>
+                <label for="cf_validation_error_message"><strong>Komunikat błędu walidacji:</strong></label><br>
+                <input type="text" id="cf_validation_error_message" name="cf_validation_error_message" value="<?php echo esc_attr($validation_error_message); ?>" style="width:100%;" placeholder="Popraw błędy w formularzu">
+                <span class="description">Komunikat wyświetlany gdy formularz zawiera błędy walidacji</span>
+            </p>
+
         </div>
         <?php
     }
@@ -633,6 +662,19 @@ class CF_Post_Types {
 
         if (isset($_POST['cf_submit_text'])) {
             update_post_meta($post_id, '_cf_submit_text', sanitize_text_field($_POST['cf_submit_text']));
+        }
+
+        // Zapisywanie komunikatów formularza
+        if (isset($_POST['cf_success_message'])) {
+            update_post_meta($post_id, '_cf_success_message', sanitize_text_field($_POST['cf_success_message']));
+        }
+
+        if (isset($_POST['cf_error_message'])) {
+            update_post_meta($post_id, '_cf_error_message', sanitize_text_field($_POST['cf_error_message']));
+        }
+
+        if (isset($_POST['cf_validation_error_message'])) {
+            update_post_meta($post_id, '_cf_validation_error_message', sanitize_text_field($_POST['cf_validation_error_message']));
         }
 
         // Zapisywanie widoku formularza z sanityzacją
