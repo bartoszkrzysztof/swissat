@@ -4,13 +4,18 @@
 
     $post_id = get_the_ID();
     $forms_list = get_field('forms_accordion', $post_id);
+
+
+ $section = get_field('kontakt');  
+$text1 = $section['text1'];
+ $text2 = $section['text2'];
 ?>
 
 <main class="p-kontakt  pod"> 
     <section  class="p-kontakt01"> 
         <div class="p-kontakt01-wrap pod-wrap "      >  
-            <h1> Napisz do nas w sprawie swojego projektu! </h1>
-            <h2> HELLO LET’S TALK ABOUT YOUR PROJECT </h2>
+            <h1> <?=$text2?></h1>
+            <h2> <?=$text1?></h2>
             <?php if ( $forms_list ) : ?>
                 <div class="p-kontakt01-boxy" >
                     <?php foreach ( $forms_list as $form ) : ?>

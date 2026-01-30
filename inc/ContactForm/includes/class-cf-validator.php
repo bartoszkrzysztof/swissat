@@ -12,6 +12,38 @@ class CF_Validator {
     private $errors = [];
 
     /**
+     * Klucze komunikatów błędów
+     */
+    const MSG_FIELD_REQUIRED = 'field_required';
+    const MSG_INVALID_EMAIL = 'invalid_email';
+    const MSG_INVALID_URL = 'invalid_url';
+    const MSG_INVALID_NUMBER = 'invalid_number';
+    const MSG_INVALID_PHONE = 'invalid_phone';
+    const MSG_FILE_TOO_LARGE = 'file_too_large';
+    const MSG_FILE_TYPE_NOT_ALLOWED = 'file_type_not_allowed';
+    const MSG_FILE_UPLOAD_ERROR = 'file_upload_error';
+    const MSG_RECAPTCHA_MISSING = 'recaptcha_missing';
+    const MSG_RECAPTCHA_VERIFICATION_ERROR = 'recaptcha_verification_error';
+    const MSG_RECAPTCHA_VERIFICATION_FAILED = 'recaptcha_verification_failed';
+
+    /**
+     * Domyślne komunikaty (fallback)
+     */
+    private $default_messages = [
+        self::MSG_FIELD_REQUIRED => 'Pole "%s" jest wymagane',
+        self::MSG_INVALID_EMAIL => 'Pole "%s" musi zawierać poprawny adres email',
+        self::MSG_INVALID_URL => 'Pole "%s" musi zawierać poprawny adres URL',
+        self::MSG_INVALID_NUMBER => 'Pole "%s" musi zawierać liczbę',
+        self::MSG_INVALID_PHONE => 'Pole "%s" musi zawierać poprawny numer telefonu',
+        self::MSG_FILE_TOO_LARGE => 'Plik jest za duży. Maksymalny rozmiar to %s MB',
+        self::MSG_FILE_TYPE_NOT_ALLOWED => 'Niedozwolony typ pliku. Dozwolone typy: %s',
+        self::MSG_FILE_UPLOAD_ERROR => 'Wystąpił błąd podczas przesyłania pliku',
+        self::MSG_RECAPTCHA_MISSING => 'Proszę potwierdzić, że nie jesteś robotem',
+        self::MSG_RECAPTCHA_VERIFICATION_ERROR => 'Błąd weryfikacji reCAPTCHA. Spróbuj ponownie.',
+        self::MSG_RECAPTCHA_VERIFICATION_FAILED => 'Weryfikacja reCAPTCHA nie powiodła się. Spróbuj ponownie.',
+    ];
+
+    /**
      * Waliduje dane formularza
      * 
      * @param array $form_data Dane z formularza
@@ -72,7 +104,7 @@ class CF_Validator {
 
         // Sprawdzenie czy pole jest wymagane
         if ($required && empty($value)) {
-            $this->errors[$name] = sprintf('Pole "%s" jest wymagane', $label);
+            $this->errors[$name] = $this->get_message(self::MSG_FIELD_REQUIRED, $label);
             return;
         }
 
@@ -80,25 +112,25 @@ class CF_Validator {
         switch ($type) {
             case 'email':
                 if (!empty($value) && !is_email($value)) {
-                    $this->errors[$name] = sprintf('Pole "%s" musi zawierać poprawny adres email', $label);
+                    $this->errors[$name] = $this->get_message(self::MSG_INVALID_EMAIL, $label);
                 }
                 break;
 
             case 'url':
                 if (!empty($value) && !filter_var($value, FILTER_VALIDATE_URL)) {
-                    $this->errors[$name] = sprintf('Pole "%s" musi zawierać poprawny adres URL', $label);
+                    $this->errors[$name] = $this->get_message(self::MSG_INVALID_URL, $label);
                 }
                 break;
 
             case 'number':
                 if (!empty($value) && !is_numeric($value)) {
-                    $this->errors[$name] = sprintf('Pole "%s" musi zawierać liczbę', $label);
+                    $this->errors[$name] = $this->get_message(self::MSG_INVALID_NUMBER, $label);
                 }
                 break;
 
             case 'tel':
                 if (!empty($value) && !preg_match('/^[0-9\s\-\+\(\)]+$/', $value)) {
-                    $this->errors[$name] = sprintf('Pole "%s" musi zawierać poprawny numer telefonu', $label);
+                    $this->errors[$name] = $this->get_message(self::MSG_INVALID_PHONE, $label);
                 }
                 break;
         }
@@ -159,8 +191,8 @@ class CF_Validator {
             // Sprawdzenie rozmiaru pliku
             $max_size = $field_config['max_size'] ?? 5242880; // 5MB domyślnie
             if ($file['size'] > $max_size) {
-                $this->errors[$field_name] = sprintf(
-                    'Plik jest za duży. Maksymalny rozmiar to %s MB',
+                $this->errors[$field_name] = $this->get_message(
+                    self::MSG_FILE_TOO_LARGE,
                     $max_size / 1024 / 1024
                 );
                 continue;
@@ -171,8 +203,8 @@ class CF_Validator {
             $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             
             if (!in_array($file_ext, $allowed_types)) {
-                $this->errors[$field_name] = sprintf(
-                    'Niedozwolony typ pliku. Dozwolone typy: %s',
+                $this->errors[$field_name] = $this->get_message(
+                    self::MSG_FILE_TYPE_NOT_ALLOWED,
                     implode(', ', $allowed_types)
                 );
                 continue;
@@ -180,7 +212,7 @@ class CF_Validator {
 
             // Sprawdzenie błędów uploadu
             if ($file['error'] !== UPLOAD_ERR_OK) {
-                $this->errors[$field_name] = 'Wystąpił błąd podczas przesyłania pliku';
+                $this->errors[$field_name] = $this->get_message(self::MSG_FILE_UPLOAD_ERROR);
             }
         }
     }
@@ -195,7 +227,7 @@ class CF_Validator {
         $recaptcha_response = $form_data['g-recaptcha-response'] ?? '';
         
         if (empty($recaptcha_response)) {
-            $this->errors['recaptcha'] = 'Proszę potwierdzić, że nie jesteś robotem';
+            $this->errors['recaptcha'] = $this->get_message(self::MSG_RECAPTCHA_MISSING);
             return;
         }
 
@@ -212,7 +244,7 @@ class CF_Validator {
         ]);
 
         if (is_wp_error($response)) {
-            $this->errors['recaptcha'] = 'Błąd weryfikacji reCAPTCHA. Spróbuj ponownie.';
+            $this->errors['recaptcha'] = $this->get_message(self::MSG_RECAPTCHA_VERIFICATION_ERROR);
             return;
         }
 
@@ -220,7 +252,7 @@ class CF_Validator {
         $result = json_decode($response_body, true);
 
         if (empty($result['success'])) {
-            $this->errors['recaptcha'] = 'Weryfikacja reCAPTCHA nie powiodła się. Spróbuj ponownie.';
+            $this->errors['recaptcha'] = $this->get_message(self::MSG_RECAPTCHA_VERIFICATION_FAILED);
         }
     }
 
@@ -260,5 +292,118 @@ class CF_Validator {
         }
 
         return null;
+    }
+
+    /**
+     * Pobiera aktualny kod języka
+     * 
+     * @return string Kod języka (np. 'pl', 'en')
+     */
+    private function get_current_language()
+    {
+        // Polylang
+        if (function_exists('pll_current_language')) {
+            $lang = pll_current_language();
+            if ($lang) {
+                return $lang;
+            }
+        }
+
+        // WPML
+        if (defined('ICL_LANGUAGE_CODE')) {
+            return ICL_LANGUAGE_CODE;
+        }
+
+        // Fallback - język WordPress
+        $locale = get_locale();
+        return substr($locale, 0, 2);
+    }
+
+    /**
+     * Pobiera przetłumaczony komunikat
+     * 
+     * @param string $message_key Klucz komunikatu
+     * @param mixed $args Argumenty do sprintf (opcjonalnie)
+     * @return string Przetłumaczony komunikat
+     */
+    private function get_message($message_key, $args = null)
+    {
+        $lang = $this->get_current_language();
+        $translations = CF_Settings::get_message_translations($lang);
+
+        // Sprawdź czy istnieje tłumaczenie dla aktualnego języka
+        if (isset($translations[$message_key])) {
+            $message = $translations[$message_key];
+        } else {
+            // Fallback do domyślnego komunikatu
+            $message = $this->default_messages[$message_key] ?? '';
+        }
+
+        // Jeśli są argumenty, użyj sprintf
+        if ($args !== null) {
+            if (is_array($args)) {
+                return sprintf($message, ...$args);
+            } else {
+                return sprintf($message, $args);
+            }
+        }
+
+        return $message;
+    }
+
+    /**
+     * Pobiera komunikat walidacyjny dla konkretnego typu
+     * (używane przy renderowaniu atrybutów data-message-*)
+     * 
+     * @param string $message_key Klucz komunikatu
+     * @param string $lang Kod języka
+     * @return string
+     */
+    public static function get_validation_message($message_key, $lang = null)
+    {
+        if ($lang === null) {
+            $validator = new self();
+            $lang = $validator->get_current_language();
+        }
+
+        $translations = CF_Settings::get_message_translations($lang);
+
+        // Sprawdź czy istnieje tłumaczenie
+        if (isset($translations[$message_key])) {
+            return $translations[$message_key];
+        }
+
+        // Fallback do domyślnych komunikatów
+        $validator = new self();
+        return $validator->default_messages[$message_key] ?? '';
+    }
+
+    /**
+     * Zwraca wszystkie komunikaty walidacyjne dla danego języka
+     * (używane przy generowaniu atrybutów data-message-*)
+     * 
+     * @param string $lang Kod języka
+     * @return array
+     */
+    public static function get_all_messages_for_lang($lang = null)
+    {
+        if ($lang === null) {
+            $validator = new self();
+            $lang = $validator->get_current_language();
+        }
+
+        $translations = CF_Settings::get_message_translations($lang);
+        $validator = new self();
+
+        // Połącz tłumaczenia z domyślnymi (jako fallback)
+        $messages = $validator->default_messages;
+        
+        foreach ($translations as $key => $value) {
+            if (!empty($value)) {
+                $messages[$key] = $value;
+            }
+        }
+
+        return $messages;
     }
 }

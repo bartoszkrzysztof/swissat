@@ -8,29 +8,47 @@ get_header();
     <section  class="p-technologie01"> 
 <div class="p-technologie01-wrap pod-wrap ">    
      <div class="boxy"> 
+         
+ <?php
+$section = get_field('sekcja1');  
+ $html1 = $section['html1'];
+ $linkf = $section['linkf'];
+ $linkp = $section['linkp'];
+ 
+?>
     
-    <div class="box-a">  
+    <div id="tea" class="box-a">  
   <video autoplay="" loop="" muted="" playsinline="">
-  <source src="/wp-content/uploads/2026/01/tech1.mp4#t=19" type="video/mp4">
+  <source src="<?=$linkf?>" type="video/mp4">
    </video>
         
         <div class="box-aa">  
-     <h3>ODKRYWANIE ELEGANCJI DOMÓW SZKIELETOWYCH</h3>
-     <h2>Budynki drewniane</h2>
-     <a href="/drewniane/">ZBADAJ SZCZEGÓŁY NASZYCH TECHNOLOGII</a>
+            <?= $html1 ?>    
+            <?=$linkp?>
+     <a href="#teb"> <i class="icon-arrow-down8"></i>  </a>
    
         </div>     
         </div>     
-    <div class="box-b" >      
+         
+          <?php
+$section = get_field('sekcja2');  
+ $html2 = $section['html2'];
+ $linkff = $section['linkff'];
+ $linkpp = $section['linkpp'];
+ 
+?>
+         
+         
+    <div id="teb" class="box-b" >      
     <video autoplay="" loop="" muted="" playsinline="">
-  <source src="/wp-content/uploads/2026/01/tech2.mov" type="video/mp4">
+  <source src="<?=$linkff?>" type="video/mp4">
    </video>
        
         
 <div class="box-bb" > 
-    <h3>NIEZMIENNA SZTUKA TRADYCYJNEJ TECHNOLOGI MUROWANEJ</h3>
-     <h2>Budynki murowane</h2>
-     <a href="/murowane/">ZBADAJ SZCZEGÓŁY NASZYCH TECHNOLOGII</a>
+   <?=$html2?>
+     <?=$linkpp?>
+     <a href="#tea"> <i class="icon-arrow-up8"></i>  </a>
     </div>    
     </div>    
   </div>
@@ -38,9 +56,7 @@ get_header();
         
     </section>
     
-        
     
-
 </main>
 
  

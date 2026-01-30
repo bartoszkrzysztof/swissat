@@ -49,7 +49,8 @@
 
             // Sprawdzenie czy pole jest wymagane
             if (isRequired && !fieldValue) {
-                error = 'To pole jest wymagane';
+                // Pobierz komunikat z atrybutu data-message-required
+                error = $field.attr('data-message-required') || 'To pole jest wymagane';
             }
 
             // Walidacja według typu
@@ -57,25 +58,29 @@
                 switch (fieldType) {
                     case 'email':
                         if (!this.isValidEmail(fieldValue)) {
-                            error = 'Wprowadź poprawny adres email';
+                            // Pobierz komunikat z atrybutu data-message-validate-email
+                            error = $field.attr('data-message-validate-email') || 'Wprowadź poprawny adres email';
                         }
                         break;
 
                     case 'url':
                         if (!this.isValidUrl(fieldValue)) {
-                            error = 'Wprowadź poprawny adres URL';
+                            // Pobierz komunikat z atrybutu data-message-validate-url
+                            error = $field.attr('data-message-validate-url') || 'Wprowadź poprawny adres URL';
                         }
                         break;
 
                     case 'tel':
                         if (!this.isValidPhone(fieldValue)) {
-                            error = 'Wprowadź poprawny numer telefonu';
+                            // Pobierz komunikat z atrybutu data-message-validate-phone
+                            error = $field.attr('data-message-validate-phone') || 'Wprowadź poprawny numer telefonu';
                         }
                         break;
 
                     case 'number':
                         if (!this.isValidNumber(fieldValue)) {
-                            error = 'Wprowadź poprawną liczbę';
+                            // Pobierz komunikat z atrybutu data-message-validate-number
+                            error = $field.attr('data-message-validate-number') || 'Wprowadź poprawną liczbę';
                         }
                         break;
                 }
@@ -120,7 +125,9 @@
             const validation = this.validateAllFields();
             
             if (!validation.isValid) {
-                this.showMessage('Popraw błędy w formularzu', 'error');
+                // Pobierz komunikat błędu walidacji z formularza (jeśli jest dostępny)
+                const validationErrorMsg = this.form.attr('data-validation-error-message') || 'Popraw błędy w formularzu';
+                this.showMessage(validationErrorMsg, 'error');
                 return;
             }
 

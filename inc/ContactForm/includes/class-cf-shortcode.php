@@ -76,11 +76,21 @@ class CF_Shortcode {
             $submit_class_attr .= ' ' . esc_attr($submit_classes);
         }
 
+        // Pobranie komunikatów formularza
+        $validation_error_msg = get_post_meta($form_id, '_cf_validation_error_message', true);
+        if (empty($validation_error_msg)) {
+            $validation_error_msg = 'Popraw błędy w formularzu';
+        }
+
         // Rozpoczęcie bufora
         ob_start();
         ?>
         <div class="<?php echo $wrapper_class_attr; ?>" data-form-id="<?php echo esc_attr($form_id); ?>">
-            <form class="<?php echo $form_class_attr; ?>" id="cf-form-<?php echo esc_attr($form_id); ?>" method="post" enctype="multipart/form-data">
+            <form class="<?php echo $form_class_attr; ?>" 
+                  id="cf-form-<?php echo esc_attr($form_id); ?>" 
+                  method="post" 
+                  enctype="multipart/form-data"
+                  data-validation-error-message="<?php echo esc_attr($validation_error_msg); ?>">
                 <?php wp_nonce_field('cf_form_submit_' . $form_id, 'cf_form_nonce'); ?>
                 <input type="hidden" name="cf_form_id" value="<?php echo esc_attr($form_id); ?>">
 
@@ -235,8 +245,18 @@ class CF_Shortcode {
         $placeholder = !empty($field['placeholder']) ? esc_attr($field['placeholder']) : '';
         $required = !empty($field['required']) ? 'required' : '';
         $rows = !empty($field['rows']) ? intval($field['rows']) : 5;
+        
+        // Atrybuty data-message-*
+        $data_attrs = '';
+        if (!empty($field['required'])) {
+            $messages = CF_Validator::get_all_messages_for_lang();
+            $label = $field['label'] ?? $field['name'];
+            if (isset($messages[CF_Validator::MSG_FIELD_REQUIRED])) {
+                $data_attrs .= sprintf(' data-message-required="%s"', esc_attr(sprintf($messages[CF_Validator::MSG_FIELD_REQUIRED], $label)));
+            }
+        }
         ?>
-        <textarea id="<?php echo $field_id; ?>" name="<?php echo $name; ?>" rows="<?php echo $rows; ?>" placeholder="<?php echo $placeholder; ?>" <?php echo $required; ?>><?php echo $value; ?></textarea>
+        <textarea id="<?php echo $field_id; ?>" name="<?php echo $name; ?>" rows="<?php echo $rows; ?>" placeholder="<?php echo $placeholder; ?>" <?php echo $required; ?><?php echo $data_attrs; ?>><?php echo $value; ?></textarea>
         <?php
     }
 
@@ -425,6 +445,9 @@ class CF_Shortcode {
             }
         }
 
+        // Dodanie atrybutów data-message-* dla walidacji JS
+        $this->add_validation_messages_attributes($attributes, $field);
+
         // Budowanie stringa
         $attr_string = '';
         foreach ($attributes as $key => $value) {
@@ -436,5 +459,53 @@ class CF_Shortcode {
         }
 
         return trim($attr_string);
+    }
+
+    /**
+     * Dodaje atrybuty data-message-* dla walidacji po stronie JS
+     * 
+     * @param array &$attributes Referencja do tablicy atrybutów
+     * @param array $field Konfiguracja pola
+     */
+    private function add_validation_messages_attributes(&$attributes, $field)
+    {
+        $type = $field['type'] ?? 'text';
+        $required = !empty($field['required']);
+        $label = $field['label'] ?? $field['name'];
+
+        // Pobranie komunikatów dla aktualnego języka
+        $messages = CF_Validator::get_all_messages_for_lang();
+
+        // Komunikat dla pola wymaganego
+        if ($required && isset($messages[CF_Validator::MSG_FIELD_REQUIRED])) {
+            $attributes['data-message-required'] = sprintf($messages[CF_Validator::MSG_FIELD_REQUIRED], $label);
+        }
+
+        // Komunikaty według typu pola
+        switch ($type) {
+            case 'email':
+                if (isset($messages[CF_Validator::MSG_INVALID_EMAIL])) {
+                    $attributes['data-message-validate-email'] = sprintf($messages[CF_Validator::MSG_INVALID_EMAIL], $label);
+                }
+                break;
+
+            case 'url':
+                if (isset($messages[CF_Validator::MSG_INVALID_URL])) {
+                    $attributes['data-message-validate-url'] = sprintf($messages[CF_Validator::MSG_INVALID_URL], $label);
+                }
+                break;
+
+            case 'number':
+                if (isset($messages[CF_Validator::MSG_INVALID_NUMBER])) {
+                    $attributes['data-message-validate-number'] = sprintf($messages[CF_Validator::MSG_INVALID_NUMBER], $label);
+                }
+                break;
+
+            case 'tel':
+                if (isset($messages[CF_Validator::MSG_INVALID_PHONE])) {
+                    $attributes['data-message-validate-phone'] = sprintf($messages[CF_Validator::MSG_INVALID_PHONE], $label);
+                }
+                break;
+        }
     }
 }
